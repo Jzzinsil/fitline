@@ -52,7 +52,19 @@ open dist/fitline.html
 | LinkedIn | **실행 거부** | robots.txt: *"자동 수단을 통한 접근은 명시적 허가 없이 엄격히 금지"* + `ClaudeBot → Disallow: /` |
 | Blind | **실행 거부** | `ClaudeBot → Disallow: /`. 로그인 월 안쪽 커뮤니티 |
 
-**수집한 공고 데이터는 이 저장소에 포함되지 않습니다** (`.gitignore`). 제3자 콘텐츠이고, robots.txt가 준 건 접근 권한이지 재배포 권리가 아닙니다. 직접 `npm run ingest`를 돌리세요.
+**수집한 공고 데이터는 이 저장소에 포함되지 않습니다** (`.gitignore`). robots.txt가 준 건 접근 권한이지 재배포 권리가 아닙니다. 직접 `npm run ingest`를 돌리세요.
+
+예외는 `fitline-data/greenhouse.json` 하나입니다. Greenhouse Job Board API는 기업이 **스스로 공개 배포하는 채널**이라 재배포가 그 취지에 부합하고, 이 스냅샷이 있어야 Vercel 빌드가 재현됩니다. 잡코리아 등 접근만 허용된 소스는 제외했습니다.
+
+## 배포
+
+```bash
+npm run build:public   # Greenhouse 분만 dist/ 로 (공개 배포용)
+npm run build          # 수집한 전체를 dist/ 로 (로컬 사용)
+npm run build:demo     # 데이터 없이 시드 15건만
+```
+
+`vercel.json`이 `build:public`을 빌드 커맨드로 쓰기 때문에, Vercel에 올라가는 사이트에는 Greenhouse 440건만 들어갑니다. `X-Robots-Tag: noindex`도 걸어 뒀습니다.
 
 ### LinkedIn·Blind·원티드 공고를 넣는 방법
 

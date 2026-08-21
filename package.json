@@ -8,7 +8,10 @@
     "ingest": "node fitline-ingest/run.mjs",
     "build": "node fitline-ingest/build.mjs",
     "build:demo": "mkdir -p dist && cp fitline.html dist/fitline.html && cp fitline.html dist/index.html",
-    "start": "npm run ingest && npm run build"
+    "start": "npm run ingest && npm run build",
+    "build:public": "node fitline-ingest/build-public.mjs"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

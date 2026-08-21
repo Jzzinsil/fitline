@@ -4,6 +4,11 @@ fitline-data/jobs.json
 fitline-data/ingest-report.json
 fitline-data/pasted/
 
+# 예외: Greenhouse 공개 Job Board API 스냅샷.
+# 기업이 스스로 공개 API로 배포하는 채널이라 재배포가 취지에 부합하고,
+# Vercel 빌드를 재현 가능하게 만든다.
+!fitline-data/greenhouse.json
+
 # 데이터가 주입된 빌드 산출물
 dist/
 
