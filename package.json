@@ -1,0 +1,14 @@
+{
+  "name": "fitline",
+  "version": "0.1.0",
+  "private": true,
+  "description": "후보자의 연구 주제·경력·영어 요건을 채용공고에 대고 채점하는 헤드헌팅 매칭 콘솔",
+  "type": "module",
+  "scripts": {
+    "ingest": "node fitline-ingest/run.mjs",
+    "build": "node fitline-ingest/build.mjs",
+    "build:demo": "mkdir -p dist && cp fitline.html dist/fitline.html && cp fitline.html dist/index.html",
+    "start": "npm run ingest && npm run build"
+  },
+  "engines": { "node": ">=20" }
+}

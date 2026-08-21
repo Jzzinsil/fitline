@@ -1,0 +1,894 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fitline</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#EEF2F1; --surface:#FCFDFD; --surface-2:#F4F7F6;
+  --ink:#0E1D1C; --ink-2:#475957; --ink-3:#7B8D8B;
+  --line:#D2DCDA; --line-soft:#E3EAE9;
+  --accent:#0D6E68; --accent-ink:#FFFFFF; --accent-soft:#DCEBE9;
+  --warn:#8A6008; --warn-soft:#F6EBD3; --block:#A32F45; --block-soft:#F7E1E4;
+  --d1:#0A5C57; --d2:#17817A; --d3:#3AA096; --d4:#71BFB4;
+  --e1:#8A6A1E; --e2:#B08A3A; --e3:#D0B074;
+  --shadow:0 1px 2px rgba(14,29,28,.06), 0 8px 24px -16px rgba(14,29,28,.28);
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:"IBM Plex Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
+  --disp:"Hahmlet","IBM Plex Sans KR",Georgia,serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0A1211; --surface:#121D1C; --surface-2:#182524;
+    --ink:#E7EEED; --ink-2:#9AACAA; --ink-3:#6E8280;
+    --line:#25332F; --line-soft:#1C2A28;
+    --accent:#4FBFB2; --accent-ink:#06201E; --accent-soft:#16302E;
+    --warn:#D9A22E; --warn-soft:#2C2415; --block:#E4708A; --block-soft:#301A20;
+    --d1:#2E8C83; --d2:#43A79C; --d3:#5EBFB4; --d4:#8AD3C9;
+    --e1:#B5892C; --e2:#CBA451; --e3:#E0C07E;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0A1211; --surface:#121D1C; --surface-2:#182524;
+  --ink:#E7EEED; --ink-2:#9AACAA; --ink-3:#6E8280;
+  --line:#25332F; --line-soft:#1C2A28;
+  --accent:#4FBFB2; --accent-ink:#06201E; --accent-soft:#16302E;
+  --warn:#D9A22E; --warn-soft:#2C2415; --block:#E4708A; --block-soft:#301A20;
+  --d1:#2E8C83; --d2:#43A79C; --d3:#5EBFB4; --d4:#8AD3C9;
+  --e1:#B5892C; --e2:#CBA451; --e3:#E0C07E;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.8);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+  font-size:15px;line-height:1.55;word-break:keep-all;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;text-wrap:balance}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ---------- top bar ---------- */
+header{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar{max-width:1560px;margin:0 auto;padding:14px 20px 0;display:flex;flex-wrap:wrap;
+  align-items:baseline;gap:8px 18px}
+.brand{font-family:var(--disp);font-weight:700;font-size:25px;letter-spacing:-.015em;line-height:1}
+.brand .dot{color:var(--accent)}
+.tag{color:var(--ink-2);font-size:13px;max-width:44ch}
+.demo{margin-left:auto;display:flex;align-items:center;gap:7px;padding:4px 9px;border-radius:99px;
+  background:var(--warn-soft);color:var(--warn);font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.06em;border:1px solid color-mix(in oklab,var(--warn) 30%,transparent)}
+.tabs{max-width:1560px;margin:0 auto;padding:12px 20px 0;display:flex;gap:2px}
+.tab{padding:8px 15px;border:1px solid transparent;border-bottom:none;border-radius:6px 6px 0 0;
+  font-size:13.5px;font-weight:500;color:var(--ink-2);transition:background .15s,color .15s}
+.tab:hover{color:var(--ink);background:var(--surface-2)}
+.tab[aria-selected="true"]{background:var(--ground);border-color:var(--line);color:var(--ink);
+  margin-bottom:-1px;padding-bottom:9px}
+.strip{max-width:1560px;margin:0 auto;padding:0 20px;display:flex;gap:0;flex-wrap:wrap;
+  border-top:1px solid var(--line-soft)}
+.stat{padding:9px 18px 9px 0;margin-right:18px;border-right:1px solid var(--line-soft);display:flex;
+  align-items:baseline;gap:7px}
+.stat:last-child{border:none}
+.stat b{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:16px;font-weight:500}
+.stat.blocked b{color:var(--block)}
+
+@media (max-width:700px){
+  .stat{border-right:none;padding:6px 14px 6px 0;margin-right:0}
+  .strip{gap:0 4px}
+  .bar{padding-bottom:4px}
+}
+main{max-width:1560px;margin:0 auto;padding:18px 20px 60px}
+
+/* ---------- console grid ---------- */
+.shell{display:grid;grid-template-columns:294px minmax(0,1fr) 348px;gap:14px;align-items:start}
+@media (max-width:1240px){.shell{grid-template-columns:270px minmax(0,1fr)}}
+@media (max-width:880px){.shell{grid-template-columns:minmax(0,1fr)}}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:9px;box-shadow:var(--shadow)}
+.phead{display:flex;align-items:center;gap:10px;padding:11px 13px;border-bottom:1px solid var(--line-soft)}
+.phead h2{font-size:13px;font-weight:600;letter-spacing:-.01em}
+.phead .lbl{margin-left:auto}
+.rail{max-height:calc(100vh - 220px);overflow-y:auto;overscroll-behavior:contain}
+@media (max-width:880px){.rail{max-height:340px}}
+
+/* direction toggle */
+.seg{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:2px;gap:2px}
+.seg button{padding:5px 10px;border-radius:5px;font-size:12px;font-weight:500;color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+
+/* rail cards */
+.card{width:100%;text-align:left;display:block;padding:11px 13px;border-bottom:1px solid var(--line-soft);
+  border-left:3px solid transparent;transition:background .13s}
+.card:hover{background:var(--surface-2)}
+.card[aria-current="true"]{background:var(--accent-soft);border-left-color:var(--accent)}
+.card .who{font-weight:600;font-size:14px;letter-spacing:-.01em}
+.card .sub{font-size:12px;color:var(--ink-2);margin-top:1px}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+.chip{font-family:var(--mono);font-size:10px;letter-spacing:.03em;padding:2px 6px;border-radius:4px;
+  background:var(--surface-2);border:1px solid var(--line-soft);color:var(--ink-2);white-space:nowrap}
+.card[aria-current="true"] .chip{background:var(--surface);border-color:var(--line)}
+.chip.hi{color:var(--accent);border-color:color-mix(in oklab,var(--accent) 35%,transparent)}
+.meter{height:3px;border-radius:2px;background:var(--line-soft);margin-top:8px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--accent);border-radius:2px}
+
+/* ---------- result rows ---------- */
+.rowhead{display:grid;grid-template-columns:44px minmax(0,1fr) 96px;gap:12px;padding:8px 14px;
+  border-bottom:1px solid var(--line-soft);background:var(--surface-2)}
+.row{border-bottom:1px solid var(--line-soft)}
+.row:last-child{border-bottom:none}
+.rtop{width:100%;text-align:left;display:grid;grid-template-columns:44px minmax(0,1fr) 96px;gap:12px;
+  padding:12px 14px;align-items:start;transition:background .13s}
+.rtop:hover{background:var(--surface-2)}
+.row[data-open="true"] .rtop{background:var(--accent-soft)}
+.score{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:23px;font-weight:500;
+  line-height:1.1;letter-spacing:-.03em}
+.score small{display:block;font-size:9.5px;letter-spacing:.1em;color:var(--ink-3);font-weight:400;margin-top:2px}
+.row.blk .score{color:var(--block)}
+.rtitle{font-weight:600;font-size:14.5px;letter-spacing:-.012em}
+.rsub{font-size:12.5px;color:var(--ink-2);margin-top:1px}
+.stack{display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:9px;background:var(--line-soft)}
+.stack i{display:block;height:100%;transition:width .35s cubic-bezier(.3,.8,.3,1)}
+.flags{display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.flag{font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;padding:2px 6px;border-radius:4px;
+  text-align:center;white-space:nowrap}
+.flag.b{background:var(--block-soft);color:var(--block)}
+.flag.w{background:var(--warn-soft);color:var(--warn)}
+.flag.g{background:var(--accent-soft);color:var(--accent)}
+
+/* breakdown */
+.detail{padding:2px 14px 16px;background:var(--surface)}
+.dimrow{display:grid;grid-template-columns:104px 1fr 40px;gap:10px;align-items:center;padding:4px 0}
+.dimrow .dn{font-size:12px;color:var(--ink-2)}
+.track{height:7px;background:var(--line-soft);border-radius:4px;overflow:hidden;position:relative}
+.track i{display:block;height:100%;border-radius:4px;transition:width .35s cubic-bezier(.3,.8,.3,1)}
+.dimrow .dv{font-family:var(--mono);font-size:11px;font-variant-numeric:tabular-nums;text-align:right;color:var(--ink-2)}
+.dimrow.nodata{opacity:.42}
+.dimrow.nodata .track{background:repeating-linear-gradient(135deg,var(--line-soft) 0 4px,transparent 4px 8px)}
+.ev{margin-top:9px;padding-top:8px;border-top:1px dashed var(--line);font-size:12.2px;color:var(--ink-2);display:flex;flex-direction:column;gap:3px}
+.ev b{color:var(--ink);font-weight:600}
+.ev q{font-family:var(--mono);font-size:11px;color:var(--accent);quotes:'\201C' '\201D'}
+.filters{display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding:9px 13px;border-bottom:1px solid var(--line-soft);background:var(--surface-2)}
+.filters input[type=search]{flex:1;min-width:120px;padding:5px 9px;border:1px solid var(--line);border-radius:6px;
+  background:var(--surface);color:var(--ink);font:inherit;font-size:12.5px}
+.filters select{padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);font:inherit;font-size:12px}
+.filters label{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-2);white-space:nowrap}
+.livebadge{font-family:var(--mono);font-size:10px;letter-spacing:.06em;padding:3px 7px;border-radius:4px;
+  background:var(--accent-soft);color:var(--accent);border:1px solid color-mix(in oklab,var(--accent) 30%,transparent)}
+.morenote{padding:10px 14px;font-size:12.5px;color:var(--ink-2);background:var(--surface-2);border-top:1px solid var(--line-soft)}
+.why{margin-top:11px;padding:10px 12px;border-radius:7px;background:var(--surface-2);
+  border:1px solid var(--line-soft);font-size:13px;line-height:1.6}
+.why b{color:var(--accent);font-weight:600}
+.why .neg{color:var(--block);font-weight:600}
+.why ul{margin:6px 0 0;padding-left:17px}
+.why li{margin-top:3px}
+.act{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}
+.btn{padding:6px 12px;border-radius:6px;border:1px solid var(--line);background:var(--surface-2);
+  font-size:12.5px;font-weight:500;transition:background .13s,border-color .13s}
+.btn:hover{background:var(--surface);border-color:var(--ink-3)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{background:color-mix(in oklab,var(--accent) 86%,black);border-color:transparent}
+
+/* ---------- outreach ---------- */
+.draft{padding:13px}
+.draft .to{font-size:12.5px;color:var(--ink-2);padding-bottom:9px;border-bottom:1px solid var(--line-soft);margin-bottom:10px}
+.draft .to b{color:var(--ink);font-weight:600}
+.msg{font-size:13.2px;line-height:1.72;white-space:pre-wrap;word-break:break-word}
+.msg .h{background:var(--accent-soft);color:var(--accent);border-radius:3px;padding:0 2px;font-weight:500}
+.empty{padding:26px 16px;text-align:center;color:var(--ink-3);font-size:13px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- docs tabs ---------- */
+.doc{max-width:1080px}
+.doc h2{font-family:var(--disp);font-size:26px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+.doc .intro{color:var(--ink-2);font-size:14.5px;max-width:66ch;margin-bottom:22px}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:9px;background:var(--surface);box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:13.2px}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:400;padding:10px 13px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+td{padding:11px 13px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td b{font-weight:600}
+td .n{display:block;color:var(--ink-2);font-size:12.2px;margin-top:2px}
+.pill{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.05em;padding:3px 7px;border-radius:4px;white-space:nowrap}
+.pill.ok{background:var(--accent-soft);color:var(--accent)}
+.pill.ap{background:var(--warn-soft);color:var(--warn)}
+.pill.no{background:var(--block-soft);color:var(--block)}
+.note{margin-top:20px;padding:15px 17px;border-radius:9px;background:var(--surface);
+  border:1px solid var(--line);border-left:3px solid var(--warn);box-shadow:var(--shadow)}
+.note h3{font-size:14px;margin-bottom:7px}
+td code{font-family:var(--mono);font-size:10.5px;background:var(--surface-2);padding:1px 4px;border-radius:3px;border:1px solid var(--line-soft);color:var(--accent);white-space:nowrap}
+td .pill{margin-left:5px}
+.note ul{margin:0;padding-left:18px;font-size:13.3px;color:var(--ink-2);line-height:1.65}
+.note li+li{margin-top:5px}
+.note b{color:var(--ink)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.slider{display:grid;grid-template-columns:110px 1fr 44px;gap:11px;align-items:center;padding:6px 0}
+.slider .sn{font-size:12.8px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.gate{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--line-soft);font-size:13px}
+.gate:first-of-type{border-top:none}
+.gate code{font-family:var(--mono);font-size:11.5px;background:var(--surface-2);padding:1px 5px;
+  border-radius:4px;border:1px solid var(--line-soft);white-space:nowrap;color:var(--block)}
+.pbody{padding:13px}
+footer{max-width:1560px;margin:0 auto;padding:0 20px 40px;color:var(--ink-3);font-size:12px}
+</style>
+
+<header>
+  <div class="bar">
+    <div class="brand">Fitline<span class="dot">.</span></div>
+    <div class="tag">후보자의 연구·경력·성향을 공고 요건에 대고 채점해서, 보낼 이유가 있는 한 건만 남기는 매칭 콘솔.</div>
+    <div class="demo">데모 데이터 · 후보자는 가명, 연봉·평점은 임의값</div>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="화면">
+    <button class="tab" role="tab" aria-selected="true" data-tab="match">매칭 콘솔</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="src">데이터 소스</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="logic">매칭 로직</button>
+  </nav>
+  <div class="strip" id="strip"></div>
+</header>
+
+<main>
+  <section id="view-match">
+    <div class="shell">
+      <div class="panel">
+        <div class="phead">
+          <h2 id="railTitle">후보자 풀</h2>
+          <div class="seg" style="margin-left:auto">
+            <button id="dirC" aria-pressed="true">후보 → 공고</button>
+            <button id="dirJ" aria-pressed="false">공고 → 후보</button>
+          </div>
+        </div>
+        <div class="rail" id="rail"></div>
+      </div>
+
+      <div class="panel">
+        <div class="phead">
+          <h2 id="resTitle">매칭 결과</h2>
+          <label style="margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2)">
+            <input type="checkbox" id="showBlocked"> 요건 미달 포함
+          </label>
+        </div>
+        <div class="filters">
+          <input type="search" id="q" placeholder="회사·직무·도메인 검색" aria-label="공고 검색">
+          <select id="srcSel" aria-label="출처 필터"></select>
+          <label><input type="checkbox" id="aiOnly" checked> AI·데이터 직무만</label>
+          <label><input type="checkbox" id="lowInfoChk"> 관련성 낮은 공고 포함</label>
+        </div>
+        <div class="rowhead">
+          <div class="lbl">점수</div>
+          <div class="lbl">대상 · 기여도 (역량 4 / 정합 3)</div>
+          <div class="lbl" style="text-align:right">판정</div>
+        </div>
+        <div id="results"></div>
+      </div>
+
+      <div class="panel" id="outPanel">
+        <div class="phead">
+          <h2>아웃리치 초안</h2>
+          <div class="seg" style="margin-left:auto">
+            <button id="langKo" aria-pressed="true">KO</button>
+            <button id="langEn" aria-pressed="false">EN</button>
+          </div>
+        </div>
+        <div id="outreach"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-src" hidden class="doc">
+    <h2>어디서 데이터를 가져오는가</h2>
+    <p class="intro">추측이 아니라 각 사이트의 robots.txt를 직접 읽고 실제로 요청을 보내본 결과입니다. 초록은 지금 데이터가 들어오고 있는 경로, 노랑은 키·제휴가 필요한 경로, 빨강은 <b>사이트가 명시적으로 금지</b>해서 코드를 만들지 않은 경로입니다.</p>
+    <p class="intro" id="srcSummary" style="padding:11px 13px;border-radius:8px;background:var(--accent-soft);color:var(--ink);max-width:none"></p>
+    <div class="tblwrap"><table>
+      <thead><tr><th>소스</th><th>여기서 얻는 것</th><th>실제로 확인한 접근 방식</th><th>결과</th></tr></thead>
+      <tbody id="srcBody"></tbody>
+    </table></div>
+    <div class="note">
+      <h3>법·제도 체크리스트 — 플랫폼 설계보다 먼저 정리해야 하는 것</h3>
+      <ul>
+        <li><b>직업안정법</b> — 국내에서 유료로 사람을 소개·알선하려면 관할 시·군·구에 <b>유료직업소개사업 등록</b>이 필요합니다. 서치펌 창업의 실질적 1단계이고, 등록 전에는 수수료를 받을 수 없습니다.</li>
+        <li><b>개인정보보호법</b> — 이력서·연락처·학력은 개인정보입니다. 수집 목적·항목·보유기간을 밝히고 <b>동의를 받은 범위 안에서만</b> 쓸 수 있고, 동의 없는 제3자(=채용 기업) 제공은 별도 동의 대상입니다. 이 플랫폼의 후보자 프로필은 전부 동의 기반 제출로 설계해야 합니다.</li>
+        <li><b>플랫폼 이용약관</b> — LinkedIn·Blind처럼 로그인 뒤에 있는 데이터를 크롤링하는 건 약관 위반이고, 계정 차단·민사 소송으로 이어집니다. 공개 페이지 크롤링도 약관상 금지된 경우가 많아, 판례가 갈리는 영역에 사업을 세우지 않는 편이 낫습니다.</li>
+        <li><b>실무 결론</b> — 공고는 공공 API + 기업 ATS 공개 엔드포인트로 채우고, 후보자 데이터는 본인 제출 + 공개 논문·GitHub 색인으로 채웁니다. 이 조합만으로 아래 매칭 로직의 입력 7개가 모두 채워집니다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="view-logic" hidden class="doc">
+    <h2>점수는 어떻게 만들어지는가</h2>
+    <p class="intro">실데이터를 넣자마자 드러난 문제가 있습니다. 공고에서 항목을 못 뽑아내면 그 항목이 가중치에서 빠지는데, 그러면 <b>정보가 없는 공고일수록 남은 항목만으로 점수가 쉽게 올라갑니다.</b> 처음 돌렸을 때 NLP 박사 신입의 1순위가 "SW영업/기술지원"이었던 이유입니다. 그래서 판단을 네 층으로 갈랐습니다.</p>
+    <div class="tblwrap" style="margin-bottom:18px"><table style="min-width:620px">
+      <thead><tr><th>층</th><th>하는 일</th><th>안 하면 생기는 일</th></tr></thead>
+      <tbody>
+        <tr><td><b>1. 하드 게이트</b><span class="n">넘으면 제외</span></td><td>학위·영어·경력·딜브레이커 요건 미달을 <b>점수와 무관하게</b> 탈락</td><td>영어 못하는 후보가 다른 점수 높아서 본사 영어 필수 자리에 추천된다</td></tr>
+        <tr><td><b>2. 관련성 게이트</b><span class="n">연구·도메인 둘 다 0이면 강등</span></td><td>연구 주제도 도메인도 안 겹치면 "보낼 근거가 범용 스킬뿐"으로 분류해 기본 화면에서 내림</td><td>Python 하나 겹쳤다고 모든 후보에게 Security Engineer가 상위로 뜬다 <span class="pill no">실제로 발생했음</span></td></tr>
+        <tr><td><b>3. 커버리지 보정</b><span class="n">×(0.5 + 0.5×커버리지)</span></td><td>7개 중 3개만 채운 매칭과 7개 다 채운 매칭을 같은 자에 올림</td><td>정보 없는 공고가 88점으로 1등을 한다 <span class="pill no">실제로 발생했음</span></td></tr>
+        <tr><td><b>4. 가중치</b><span class="n">조정 가능</span></td><td>남은 항목의 상대적 중요도. 고객사마다 다르니 직접 조정</td><td>—</td></tr>
+      </tbody>
+    </table></div>
+    <p class="intro">아래 슬라이더를 움직이면 매칭 콘솔 순위가 즉시 다시 계산됩니다. 데이터가 없는 항목은 <b>0점이 아니라 "—"</b>로 표시되고 가중치에서 빠집니다. 0점을 주면 없는 사실을 나쁜 사실로 바꾸는 것이라서요.</p>
+    <div class="grid2">
+      <div class="panel"><div class="phead"><h2>가중치</h2><span class="lbl" id="wsum"></span></div>
+        <div class="pbody" id="sliders"></div>
+      </div>
+      <div class="panel"><div class="phead"><h2>하드 게이트</h2><span class="lbl">넘으면 제외</span></div>
+        <div class="pbody">
+          <div class="gate"><code>학위 &lt; 요구학위</code><span>박사 필수 공고에 석사를 넣는 건 시간 낭비. 학위 <em>우대</em>는 게이트가 아니라 가중치로 갑니다.</span></div>
+          <div class="gate"><code>영어갭 ≥ 2</code><span>본사 보고·영문 면접이 있는 자리에 영어 2단계 아래를 보내면 서류는 통과해도 면접에서 끝납니다.</span></div>
+          <div class="gate"><code>경력 &lt; 하한−2년</code><span>신입 채용이 아닌 공고의 연차 하한은 실제로 잘 안 깎입니다.</span></div>
+          <div class="gate"><code>경력 &gt; 상한+3년</code><span>과잉 경력은 보상·직급 충돌로 되돌아옵니다. 리드 트랙 공고라면 상한을 따로 둡니다.</span></div>
+          <div class="gate"><code>딜브레이커 일치</code><span>후보가 명시적으로 거부한 조건(순환근무, 야간 온콜, 비ML 업무 등)에 걸리면 즉시 제외.</span></div>
+          <div class="gate"><code>희망연봉 &gt; 상한×1.15</code><span>게이트가 아니라 경고. 15% 안쪽은 협상 가능 구간으로 두고 초안에 먼저 적어둡니다.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="note" style="border-left-color:var(--accent)">
+      <h3>이 로직이 헤드헌터로서 만드는 차이</h3>
+      <ul>
+        <li><b>연구 주제 단위 매칭</b> — "AI 엔지니어"가 아니라 "대화 요약 박사 → LLM 서빙 팀"으로 붙습니다. 전공명보다 논문 주제가 훨씬 강한 신호이고, 이건 공개 논문 색인에서 무료로 얻습니다.</li>
+        <li><b>보낸 이유가 문장으로 남습니다</b> — 각 매칭의 상위 기여 항목이 그대로 아웃리치 첫 문단이 됩니다. "좋은 자리 있습니다"와 답장률이 다릅니다.</li>
+        <li><b>안 보낸 이유도 남습니다</b> — 차단 사유가 기록되니까, 요건이 바뀌었을 때 그 후보만 다시 꺼낼 수 있습니다.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+<footer id="foot">Fitline · 공고는 robots.txt가 허용한 경로에서만 수집한 실제 데이터입니다. 후보자 12명은 가명 데모 프로필이며, 기업 평점·희망연봉은 임의값입니다.</footer>
+<textarea id="clip" class="sr" aria-hidden="true"></textarea>
+<script type="application/json" id="jobs-data">[]</script>
+
+<script>
+const EN=['','읽기 위주','문서·이메일','회의 참여','업무 유창','본사 업무 수준'];
+const EN_L=['','reading only','documents & email','meeting-capable','fluent at work','HQ-level'];
+const DEG={'학사':1,'석사':2,'박사':3};
+const won=n=>n.toLocaleString('ko-KR');
+
+const DIMS=[
+ {k:'research',n:'연구·전공 적합',c:'--d1',w:22},
+ {k:'skills',  n:'기술 스택',    c:'--d2',w:22},
+ {k:'domain',  n:'도메인 경험',  c:'--d3',w:12},
+ {k:'level',   n:'경력 레벨',    c:'--d4',w:16},
+ {k:'english', n:'영어 요건',    c:'--e1',w:12},
+ {k:'culture', n:'기업 성향 정합',c:'--e2',w:10},
+ {k:'comp',    n:'보상 정합',    c:'--e3',w:6},
+];
+
+/* 실데이터 주입 슬롯 — build.mjs가 채운다 */
+const REAL_JOBS=(()=>{try{return JSON.parse(document.getElementById('jobs-data').textContent)}catch{return null}})();
+
+const C=[
+{id:'c1',alias:'김○○ (가명)',now:'국내 AI 랩 · 박사과정 수료',yrs:0,
+ deg:{lv:'박사',major:'컴퓨터공학',topic:'대화 요약 · 지시학습'},research:['LLM','대화','정렬학습','생성평가'],
+ skills:['Python','PyTorch','LLM 파인튜닝','RLHF','RAG','분산학습'],domains:['LLM','대화','NLP'],
+ en:4,enWhy:'1저자 영문 논문 5편 · 국제학회 구두발표',
+ pref:{types:['글로벌','유니콘'],care:['기술난이도','성장'],dealbreak:['비ML 업무','순환근무']},
+ comp:{cur:0,want:9000},move:82,moveWhy:'졸업 3개월 전 · 공개 프로필 최근 갱신',src:'학회 발표자 색인 + 본인 제출'},
+{id:'c2',alias:'박○○ (가명)',now:'제조 대기업 · 비전 알고리즘',yrs:3,
+ deg:{lv:'석사',major:'전자공학',topic:'결함 검출 세그멘테이션'},research:['비전','Segmentation','산업검사'],
+ skills:['Python','PyTorch','Detection','Segmentation','ONNX'],domains:['비전','제조'],
+ en:2,enWhy:'사내 영문 문서 작성 · 회의는 통역 필요',
+ pref:{types:['유니콘','스타트업'],care:['성장','기술난이도'],dealbreak:['순환근무','야간 온콜']},
+ comp:{cur:6800,want:7800},move:64,moveWhy:'동일 업무 3년 · 도메인 전환 희망 명시',src:'본인 제출'},
+{id:'c3',alias:'이○○ (가명)',now:'국내 플랫폼 · ML 플랫폼 엔지니어',yrs:6,
+ deg:{lv:'학사',major:'컴퓨터공학',topic:'—'},research:['MLOps','서빙'],
+ skills:['Python','Kubernetes','Kubeflow','Airflow','ML 서빙','Kafka','대용량 데이터','Feature Store'],
+ domains:['MLOps','검색'],en:3,enWhy:'오픈소스 영문 이슈·PR 상시 · 회의 가능',
+ pref:{types:['유니콘','글로벌'],care:['보상','기술난이도'],dealbreak:['비ML 업무']},
+ comp:{cur:9500,want:11000},move:71,moveWhy:'조직 개편 후 리포팅 라인 변경',src:'GitHub 공개 색인 + 본인 제출'},
+{id:'c4',alias:'최○○ (가명)',now:'대기업 AI 조직 · 추천 파트리드',yrs:8,
+ deg:{lv:'박사',major:'산업공학',topic:'순차 추천 · 랭킹 최적화'},research:['추천','랭킹','인과추론'],
+ skills:['Python','PyTorch','추천 모델','그래프 ML','Spark','SQL','A/B 테스트','대용량 데이터'],
+ domains:['추천','광고','검색'],en:4,enWhy:'해외 학회 발표 · 글로벌 협업 프로젝트 2년',
+ pref:{types:['글로벌','대기업'],care:['보상','글로벌'],dealbreak:['순환근무']},
+ comp:{cur:14000,want:16500},move:38,moveWhy:'스톡 베스팅 1년 남음 — 조건부 검토',src:'본인 제출'},
+{id:'c5',alias:'정○○ (가명)',now:'LLM 스타트업 · 인퍼런스 엔지니어',yrs:2,
+ deg:{lv:'석사',major:'컴퓨터공학',topic:'추론 최적화 · KV 캐시'},research:['LLM','서빙','양자화'],
+ skills:['Python','PyTorch','vLLM','양자화','CUDA','Triton','ML 서빙'],domains:['LLM','MLOps'],
+ en:3,enWhy:'영문 기술문서 작성 · 해외 밋업 발표 1회',
+ pref:{types:['글로벌','유니콘','스타트업'],care:['기술난이도','성장'],dealbreak:[]},
+ comp:{cur:7200,want:8600},move:58,moveWhy:'시리즈 A 지연 · 최근 채용공고 열람 증가',src:'본인 제출'},
+{id:'c6',alias:'한○○ (가명)',now:'커머스 · 데이터 사이언티스트',yrs:5,
+ deg:{lv:'석사',major:'통계학',topic:'인과추론 기반 실험 설계'},research:['인과추론','실험설계','추천'],
+ skills:['Python','SQL','A/B 테스트','인과추론','Spark','대용량 데이터'],domains:['추천','광고','금융'],
+ en:2,enWhy:'영문 리딩 가능 · 발표는 국문 선호',
+ pref:{types:['유니콘','대기업'],care:['워라밸','안정성'],dealbreak:['야간 온콜']},
+ comp:{cur:9000,want:10000},move:45,moveWhy:'현직 만족도 보통 · 좋은 조건만 검토',src:'본인 제출'},
+{id:'c7',alias:'윤○○ (가명)',now:'해외 대학 포스트닥 · 로봇 학습',yrs:3,
+ deg:{lv:'박사',major:'기계공학',topic:'강화학습 기반 조작 · Sim2Real'},research:['강화학습','로보틱스','Sim2Real'],
+ skills:['Python','PyTorch','ROS','Sim2Real','JAX','분산학습'],domains:['로보틱스','강화학습'],
+ en:5,enWhy:'해외 박사 · 영어 강의 및 심사 경험',
+ pref:{types:['글로벌','스타트업'],care:['기술난이도','글로벌'],dealbreak:['비ML 업무']},
+ comp:{cur:0,want:13000},move:76,moveWhy:'포닥 계약 만료 6개월 전 · 국내 복귀 희망',src:'논문 색인 + 추천'},
+{id:'c8',alias:'서○○ (가명)',now:'대학원 졸업 예정 · 음성 인식',yrs:0,
+ deg:{lv:'석사',major:'컴퓨터공학',topic:'저자원 언어 ASR'},research:['음성','ASR','NLP'],
+ skills:['Python','PyTorch','ASR','TTS'],domains:['음성','NLP'],
+ en:3,enWhy:'영문 논문 2편 공저 · 회의 참여 가능',
+ pref:{types:['유니콘','대기업','스타트업'],care:['성장','안정성'],dealbreak:[]},
+ comp:{cur:0,want:6000},move:88,moveWhy:'졸업 직전 · 적극 구직 중',src:'본인 제출'},
+{id:'c9',alias:'조○○ (가명)',now:'핀테크 · 백엔드 → ML 전환',yrs:4,
+ deg:{lv:'학사',major:'소프트웨어학',topic:'—'},research:['서빙','MLOps'],
+ skills:['Python','SQL','Kafka','ML 서빙','대용량 데이터','Airflow'],domains:['금융','이상탐지','MLOps'],
+ en:2,enWhy:'문서 위주 · 회의는 부담',
+ pref:{types:['유니콘','스타트업'],care:['성장','보상'],dealbreak:['순환근무']},
+ comp:{cur:7000,want:8200},move:69,moveWhy:'ML 직무 전환 목표 명시 · 사이드 프로젝트 공개',src:'GitHub 공개 색인 + 본인 제출'},
+{id:'c10',alias:'강○○ (가명)',now:'반도체 대기업 · 온디바이스 최적화',yrs:2,
+ deg:{lv:'박사',major:'전기전자공학',topic:'저비트 양자화 · NPU 컴파일'},research:['온디바이스','양자화','컴파일러'],
+ skills:['Python','PyTorch','양자화','TensorRT','ONNX','CUDA','C++'],domains:['온디바이스','비전'],
+ en:3,enWhy:'영문 특허·논문 작성 · 회의 가능',
+ pref:{types:['글로벌','대기업'],care:['기술난이도','보상'],dealbreak:['순환근무']},
+ comp:{cur:9800,want:11200},move:52,moveWhy:'글로벌 하드웨어 기업만 검토 의사',src:'논문·특허 색인 + 본인 제출'},
+{id:'c11',alias:'임○○ (가명)',now:'의료AI 기업 · 리서치 사이언티스트',yrs:6,
+ deg:{lv:'박사',major:'의공학',topic:'흉부 영상 판독 보조'},research:['비전','헬스케어','Segmentation','임상검증'],
+ skills:['Python','PyTorch','Segmentation','Detection','DICOM','Diffusion'],domains:['헬스케어','비전'],
+ en:4,enWhy:'영문 임상 논문 다수 · 해외 규제기관 대응 경험',
+ pref:{types:['글로벌','유니콘'],care:['기술난이도','글로벌'],dealbreak:['야간 온콜']},
+ comp:{cur:12000,want:14000},move:57,moveWhy:'해외 진출 조직 우선 검토',src:'논문 색인 + 본인 제출'},
+{id:'c12',alias:'오○○ (가명)',now:'글로벌 커머스 한국지사 · 검색 랭킹',yrs:4,
+ deg:{lv:'석사',major:'컴퓨터공학',topic:'질의 이해 · 학습 기반 랭킹'},research:['검색','랭킹','LLM'],
+ skills:['Python','PyTorch','추천 모델','SQL','A/B 테스트','RAG','대용량 데이터'],domains:['검색','추천','LLM'],
+ en:4,enWhy:'영문 근무 환경 4년 · 본사 리뷰 참여',
+ pref:{types:['글로벌','유니콘'],care:['보상','글로벌'],dealbreak:['비ML 업무']},
+ comp:{cur:10000,want:11500},move:61,moveWhy:'조직 축소 발표 이후 문의 시작',src:'본인 제출'},
+];
+
+const SEED_J=[
+{id:'j1',co:'두나무',type:'유니콘',title:'ML Engineer · 이상거래탐지',team:'Fraud Risk',
+ yrs:[3,7],en:2,deg:'학사',degPref:['석사'],majors:['컴퓨터공학','통계학','산업공학'],
+ research:['이상탐지','그래프','금융'],must:['Python','ML 서빙','대용량 데이터'],nice:['Kafka','그래프 ML','SQL'],
+ domains:['금융','이상탐지'],comp:[8500,13500],loc:'서울 강남',strength:['보상','성장'],
+ flags:['야간 온콜'],src:'기업 채용페이지',rate:{jp:3.9,bl:3.6}},
+{id:'j2',co:'토스',type:'유니콘',title:'MLOps Engineer',team:'ML Platform',
+ yrs:[4,9],en:2,deg:'학사',degPref:[],majors:['컴퓨터공학','소프트웨어학'],
+ research:['MLOps','서빙','플랫폼'],must:['Kubernetes','ML 서빙','Airflow'],nice:['Kubeflow','Feature Store','Kafka'],
+ domains:['MLOps','금융'],comp:[9500,15000],loc:'서울 역삼',strength:['보상','기술난이도'],
+ flags:['야간 온콜'],src:'기업 채용페이지',rate:{jp:4.1,bl:3.9}},
+{id:'j3',co:'쿠팡',type:'글로벌',title:'Applied Scientist · Search Ranking',team:'Search Science',
+ yrs:[3,8],en:4,deg:'석사',degPref:['박사'],majors:['컴퓨터공학','산업공학','통계학'],
+ research:['검색','랭킹','추천','인과추론'],must:['Python','추천 모델','A/B 테스트'],nice:['Spark','대용량 데이터','SQL'],
+ domains:['검색','추천'],comp:[12000,19000],loc:'서울 잠실',strength:['보상','글로벌'],
+ flags:[],src:'기업 채용페이지 (영문)',rate:{jp:3.4,bl:3.2}},
+{id:'j4',co:'하이퍼커넥트',type:'유니콘',title:'ML Engineer · 음성/영상 품질',team:'Media AI',
+ yrs:[2,6],en:3,deg:'석사',degPref:[],majors:['컴퓨터공학','전자공학'],
+ research:['음성','비전','ASR'],must:['Python','PyTorch','ASR'],nice:['TTS','ONNX','양자화'],
+ domains:['음성','비전'],comp:[8000,13000],loc:'서울 서초',strength:['기술난이도','글로벌'],
+ flags:[],src:'기업 채용페이지',rate:{jp:4.0,bl:3.8}},
+{id:'j5',co:'업스테이지',type:'스타트업',title:'LLM Research Engineer',team:'Foundation Model',
+ yrs:[1,5],en:3,deg:'석사',degPref:['박사'],majors:['컴퓨터공학','전자공학'],
+ research:['LLM','정렬학습','분산학습','생성평가'],must:['PyTorch','LLM 파인튜닝','분산학습'],nice:['RLHF','vLLM','RAG'],
+ domains:['LLM','NLP'],comp:[8000,14000],loc:'서울 강남',strength:['기술난이도','성장'],
+ flags:[],src:'기업 채용페이지',rate:{jp:3.8,bl:3.5}},
+{id:'j6',co:'네이버',type:'대기업',title:'AI Research · Speech',team:'Speech AI',
+ yrs:[0,4],en:2,deg:'박사',degPref:[],majors:['컴퓨터공학','전자공학'],
+ research:['음성','ASR','TTS'],must:['PyTorch','ASR'],nice:['TTS','분산학습'],
+ domains:['음성','NLP'],comp:[7500,12000],loc:'경기 분당',strength:['안정성','워라밸'],
+ flags:[],src:'기업 채용페이지',rate:{jp:4.0,bl:3.7}},
+{id:'j7',co:'카카오',type:'대기업',title:'추천 시스템 엔지니어',team:'Recommendation',
+ yrs:[3,8],en:2,deg:'학사',degPref:['석사'],majors:['컴퓨터공학','산업공학','통계학'],
+ research:['추천','랭킹'],must:['Python','추천 모델','대용량 데이터'],nice:['Spark','그래프 ML','A/B 테스트'],
+ domains:['추천','광고'],comp:[8500,13000],loc:'경기 판교',strength:['워라밸','안정성'],
+ flags:[],src:'기업 채용페이지',rate:{jp:3.9,bl:3.6}},
+{id:'j8',co:'삼성리서치',type:'대기업',title:'On-device AI 최적화',team:'Efficient AI',
+ yrs:[3,8],en:3,deg:'석사',degPref:['박사'],majors:['전기전자공학','컴퓨터공학'],
+ research:['온디바이스','양자화','컴파일러'],must:['PyTorch','양자화','C++'],nice:['TensorRT','ONNX','CUDA'],
+ domains:['온디바이스','비전'],comp:[9000,14000],loc:'서울 우면',strength:['안정성','보상'],
+ flags:['순환근무'],src:'그룹 채용 사이트',rate:{jp:3.8,bl:3.5}},
+{id:'j9',co:'Google Korea',type:'글로벌',title:'Software Engineer, Machine Learning',team:'Search Infra',
+ yrs:[3,12],en:5,deg:'학사',degPref:['석사','박사'],majors:['컴퓨터공학','소프트웨어학'],
+ research:['서빙','MLOps','검색'],must:['Python','ML 서빙','대용량 데이터'],nice:['Kubernetes','분산학습','SQL'],
+ domains:['검색','MLOps'],comp:[16000,26000],loc:'서울 강남',strength:['보상','글로벌','기술난이도'],
+ flags:[],src:'본사 채용 사이트 (영문)',rate:{jp:4.4,bl:4.3}},
+{id:'j10',co:'NVIDIA Korea',type:'글로벌',title:'Deep Learning Solutions Architect',team:'Solutions',
+ yrs:[4,10],en:5,deg:'석사',degPref:['박사'],majors:['전기전자공학','컴퓨터공학'],
+ research:['온디바이스','양자화','서빙'],must:['CUDA','PyTorch','양자화'],nice:['TensorRT','Triton','C++'],
+ domains:['온디바이스','MLOps'],comp:[15000,24000],loc:'서울 삼성동',strength:['보상','글로벌'],
+ flags:[],src:'본사 채용 사이트 (영문)',rate:{jp:4.3,bl:4.2}},
+{id:'j11',co:'뤼튼테크놀로지스',type:'스타트업',title:'LLM Product Engineer',team:'Product AI',
+ yrs:[1,4],en:2,deg:'학사',degPref:['석사'],majors:['컴퓨터공학','소프트웨어학'],
+ research:['LLM','서빙','RAG'],must:['Python','RAG','ML 서빙'],nice:['vLLM','LangChain','LLM 파인튜닝'],
+ domains:['LLM','MLOps'],comp:[6500,11000],loc:'서울 강남',strength:['성장','기술난이도'],
+ flags:['야간 온콜'],src:'기업 채용페이지',rate:{jp:3.7,bl:3.4}},
+{id:'j12',co:'스캐터랩',type:'스타트업',title:'대화 모델 리서처',team:'Conversation',
+ yrs:[0,3],en:2,deg:'석사',degPref:['박사'],majors:['컴퓨터공학','언어학'],
+ research:['대화','LLM','정렬학습','생성평가'],must:['PyTorch','LLM 파인튜닝'],nice:['RLHF','RAG','분산학습'],
+ domains:['대화','LLM','NLP'],comp:[6000,10000],loc:'서울 성수',strength:['기술난이도','성장'],
+ flags:[],src:'기업 채용페이지',rate:{jp:3.9,bl:3.6}},
+{id:'j13',co:'LG AI연구원',type:'대기업',title:'Vision Researcher',team:'Vision Lab',
+ yrs:[2,8],en:3,deg:'박사',degPref:[],majors:['전자공학','컴퓨터공학','의공학'],
+ research:['비전','Segmentation','Diffusion'],must:['PyTorch','Segmentation','Detection'],nice:['Diffusion','분산학습'],
+ domains:['비전','헬스케어'],comp:[9000,15000],loc:'서울 마곡',strength:['안정성','기술난이도'],
+ flags:[],src:'기업 채용페이지',rate:{jp:4.0,bl:3.8}},
+{id:'j14',co:'루닛',type:'유니콘',title:'Medical AI Researcher',team:'Clinical AI',
+ yrs:[3,8],en:4,deg:'박사',degPref:[],majors:['의공학','컴퓨터공학','전자공학'],
+ research:['헬스케어','비전','임상검증','Segmentation'],must:['PyTorch','Segmentation','DICOM'],nice:['Detection','Diffusion'],
+ domains:['헬스케어','비전'],comp:[10000,16000],loc:'서울 강남',strength:['글로벌','기술난이도'],
+ flags:[],src:'기업 채용페이지 (영문 병기)',rate:{jp:3.8,bl:3.5}},
+{id:'j15',co:'레인보우로보틱스',type:'유니콘',title:'Robot Learning Researcher',team:'Manipulation',
+ yrs:[1,6],en:3,deg:'박사',degPref:[],majors:['기계공학','전기전자공학','컴퓨터공학'],
+ research:['강화학습','로보틱스','Sim2Real'],must:['Python','PyTorch','ROS'],nice:['Sim2Real','JAX','C++'],
+ domains:['로보틱스','강화학습'],comp:[9000,15000],loc:'대전',strength:['기술난이도','안정성'],
+ flags:[],src:'기업 채용페이지',rate:{jp:3.7,bl:3.4}},
+];
+// 실데이터가 있으면 그걸 쓰고, 없으면 시드 15건으로 동작한다.
+const J=(REAL_JOBS&&REAL_JOBS.length)?REAL_JOBS:SEED_J;
+const LIVE=!!(REAL_JOBS&&REAL_JOBS.length);
+
+
+/* ---------------- 매칭 엔진 ---------------- */
+const inter=(a,b)=>a.filter(x=>b.includes(x));
+const jong=w=>{const t=(w||'').trim();if(!t)return false;const ch=t.charCodeAt(t.length-1);
+  return ch>=0xAC00&&ch<=0xD7A3?((ch-0xAC00)%28)!==0:/[1367890lmnrLMNR]$/.test(t)};
+const iga=w=>jong(w)?'이':'가', eun=w=>jong(w)?'은':'는';
+const yl=n=>n===0?'신입':n+'년';
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+
+function evaluate(c,j,W){
+  const gates=[],warns=[];
+  if(DEG[c.deg.lv]<DEG[j.deg]) gates.push({t:'학위 미달',d:`${j.deg} 이상 요구 · 후보 ${c.deg.lv}`});
+  const eGap=j.en-c.en;
+  if(eGap>=2) gates.push({t:'영어 미달',d:`요구 ${EN[j.en]} · 후보 ${EN[c.en]}`});
+  if(c.yrs>j.yrs[1]+3) gates.push({t:'과잉 경력',d:`공고 ${j.yrs[0]}–${j.yrs[1]}년 · 후보 ${c.yrs}년`});
+  if(c.yrs<j.yrs[0]-2) gates.push({t:'경력 미달',d:`공고 ${j.yrs[0]}년 하한 · 후보 ${c.yrs}년`});
+  const db=inter(c.pref.dealbreak,j.flags||[]);
+  if(db.length) gates.push({t:'딜브레이커',d:db.join(' · ')});
+
+  if(eGap===1) warns.push({t:'영어 1단계',d:`요구 ${EN[j.en]} · 후보 ${EN[c.en]} — 면접 언어 사전 확인`});
+  if(j.comp&&c.comp.want>j.comp[1]) warns.push({t:'보상 갭',d:`희망 ${won(c.comp.want)} · 상한 ${won(j.comp[1])} (만원)`});
+  if(j.type!=='미분류'&&!c.pref.types.includes(j.type)) warns.push({t:'기업 성향',d:`선호 ${c.pref.types.join('/')} · 공고 ${j.type}`});
+
+  const must=j.must||[], nice=j.nice||[], res=j.research||[], doms=(j.domains||[]).filter(d=>d!=='미분류');
+  const mHit=inter(c.skills,must), nHit=inter(c.skills,nice);
+  const rHit=inter(c.research,res), dHit=inter(c.domains,doms);
+  const s={};
+  // null = 데이터 없음. 0점이 아니라 가중치에서 빼는 게 정직하다.
+  const hasRes=res.length>0||(j.majors||[]).length>0;
+  s.research=hasRes?clamp(.6*(res.length?rHit.length/res.length:0)
+              +.28*((j.majors||[]).includes(c.deg.major)?1:0)
+              +((j.degPref||[]).includes(c.deg.lv)?.12:0)):null;
+  s.skills=must.length?clamp(.72*(mHit.length/must.length)+(nice.length?.28*(nHit.length/nice.length):0)):null;
+  s.domain=doms.length?clamp(dHit.length/doms.length):null;
+  s.level=c.yrs>=j.yrs[0]&&c.yrs<=j.yrs[1]?1
+          :clamp(1-.28*(c.yrs<j.yrs[0]?j.yrs[0]-c.yrs:c.yrs-j.yrs[1]));
+  s.english=c.en>=j.en?1:clamp(1-.45*eGap);
+  const strength=j.strength||[];
+  if(j.type==='미분류'&&!strength.length){ s.culture=null }
+  else{ let cu=c.pref.types.includes(j.type)?.74:.2;
+        c.pref.care.forEach(k=>{if(strength.includes(k))cu+=.13});
+        s.culture=clamp(cu) }
+  s.comp=j.comp?(c.comp.want<=j.comp[1]?(c.comp.want>=j.comp[0]*.8?1:.85)
+        :clamp(1-2.2*((c.comp.want-j.comp[1])/j.comp[1]))):null;
+
+  const contrib={}; let WT=0;
+  DIMS.forEach(d=>{ if(s[d.k]===null){contrib[d.k]=0} else {contrib[d.k]=s[d.k]*W[d.k]; WT+=W[d.k]} });
+  const raw=WT?Math.round(DIMS.reduce((a,d)=>a+contrib[d.k],0)/WT*100):0;
+  const WALL=DIMS.reduce((a,d)=>a+W[d.k],0);
+  const cov=WT/WALL;
+  // 항목이 빠지면 남은 항목만으로 점수가 쉽게 올라간다. 그대로 두면 정보 없는 공고가 1등을 한다.
+  // 커버리지로 보정해서 7개 다 채운 매칭과 3개만 채운 매칭을 같은 자에 올린다.
+  const total=Math.round(raw*(.5+.5*cov));
+  const missing=DIMS.filter(d=>s[d.k]===null).map(d=>d.n);
+  // 연구 주제도 도메인도 안 겹치면 '핏'이 아니다. 범용 스킬(Python 등)만으로 올라온 점수는
+  // 아무 데나 보내는 메일과 구별이 안 된다 — 이게 이 도구가 없애려는 바로 그 상황이다.
+  const relevant=(s.research!==null&&s.research>0)||(s.domain!==null&&s.domain>0);
+  if(!relevant) warns.unshift({t:'관련성 없음',d:'연구 주제·도메인 어느 쪽도 겹치지 않음 — 보낼 근거가 범용 스킬뿐'});
+  else if(cov<.45) warns.unshift({t:'정보 부족',d:`${missing.length}개 항목 데이터 없음 (커버리지 ${Math.round(cov*100)}%) — 공고 원문 확인 필요`});
+  return {c,j,s,contrib,WT,total,raw,cov,relevant,
+    lowInfo:(!relevant||cov<.45)?1:0,gates,warns,mHit,nHit,rHit,dHit,missing};
+}
+
+function reasons(r){
+  const {c,j,s,mHit,rHit,dHit}=r;
+  const tp=c.deg.topic==='—'?c.deg.major:c.deg.topic;
+  const careHit=inter(c.pref.care,j.strength||[]);
+  const must=j.must||[], res=j.research||[], doms=(j.domains||[]).filter(d=>d!=='미분류');
+  const txt={
+    research:`${c.deg.lv} 연구 주제 「<b>${tp}</b>」${iga(tp)} ${j.team&&j.team!=='—'?j.team+' ':''}요건과 겹칩니다`
+      +(rHit.length?` — ${rHit.join(', ')}`:res.length?` (공고 주제 ${res.join(', ')})`:''),
+    skills:`필수 스택 <b>${mHit.length}/${must.length}</b> 보유${mHit.length?` — ${mHit.join(', ')}`:''}`,
+    domain:dHit.length?`<b>${dHit.join(', ')}</b> 도메인 경험 보유`:`공고 도메인(${doms.join(', ')}) 경험 없음`,
+    level:s.level===1
+      ?`경력 <b>${yl(c.yrs)}</b> — 공고 ${j.yrs[0]}–${j.yrs[1]}년 요건 충족`
+      :`경력 <b>${yl(c.yrs)}</b> — 공고 ${j.yrs[0]}–${j.yrs[1]}년 기준 ${c.yrs<j.yrs[0]?`하한 ${j.yrs[0]-c.yrs}년 부족`:`상한 ${c.yrs-j.yrs[1]}년 초과`}`,
+    english:c.en>=j.en?`영어 <b>${EN[c.en]}</b> — ${c.enWhy}`
+      :`영어 요구 <b>${EN[j.en]}</b>에 ${j.en-c.en}단계 부족 — ${c.enWhy}`,
+    culture:c.pref.types.includes(j.type)
+      ?`<b>${j.type}</b> 선호와 일치${careHit.length?` · 중시하는 ${careHit.join('/')}${eun(careHit[careHit.length-1])} 공고 강점`:''}`
+      :`선호는 ${c.pref.types.join('/')} — 이 공고는 <b>${j.type}</b>${careHit.length?`. 다만 중시하는 ${careHit.join('/')}${eun(careHit[careHit.length-1])} 충족`:''}`,
+    comp:!j.comp?`공고에 처우 미공개`
+      :c.comp.want<=j.comp[1]
+      ?`희망 <b>${won(c.comp.want)}</b> — 공고 ${won(j.comp[0])}–${won(j.comp[1])}만원 안에 들어옵니다`
+      :`희망 <b>${won(c.comp.want)}</b>이 공고 상한 ${won(j.comp[1])}만원을 ${won(c.comp.want-j.comp[1])}만원 초과`,
+  };
+  const txtEn={
+    research:`${({'학사':'BS','석사':'MS','박사':'PhD'})[c.deg.lv]} research on "${tp}" overlaps the role's focus${rHit.length?` — ${rHit.join(', ')}`:''}`,
+    skills:`${mHit.length}/${must.length} required skills${mHit.length?` — ${mHit.join(', ')}`:''}`,
+    domain:dHit.length?`prior work in ${dHit.join(', ')}`:`no experience in ${doms.join(', ')}`,
+    level:s.level===1?`${c.yrs===0?'new grad':c.yrs+' yrs'} — inside the posted ${j.yrs[0]}–${j.yrs[1]} yr band`
+      :`${c.yrs===0?'new grad':c.yrs+' yrs'} — outside the posted ${j.yrs[0]}–${j.yrs[1]} yr band`,
+    english:c.en>=j.en?`English ${EN_L[c.en]} — ${c.enWhy}`:`English ${j.en-c.en} level short of ${EN_L[j.en]}`,
+    culture:c.pref.types.includes(j.type)?`prefers ${j.type} companies — matches`:`prefers ${c.pref.types.join('/')}, this is ${j.type}`,
+    comp:!j.comp?`compensation not posted`:`target ${won(c.comp.want)} vs posted ${won(j.comp[0])}–${won(j.comp[1])} (10k KRW)`,
+  };
+  const live=DIMS.filter(d=>s[d.k]!==null);
+  const rank=[...live].sort((a,b)=>r.contrib[b.k]-r.contrib[a.k]);
+  const weak=live.filter(d=>s[d.k]<.55).sort((a,b)=>s[a.k]-s[b.k]);
+  return {top:rank.slice(0,3).map(d=>({d,html:txt[d.k],en:txtEn[d.k]})),
+          weak:weak.slice(0,2).map(d=>({d,html:txt[d.k],en:txtEn[d.k]})),txt,txtEn};
+}
+
+/* ---------------- 아웃리치 초안 ---------------- */
+function draft(r,lang){
+  const {c,j}=r, R=reasons(r), strip=h=>h.replace(/<\/?b>/g,'').replace(/[「」]/g,'"');
+  const caveat=r.warns.find(w=>w.t!=='정보 부족')||r.warns[0]||null;
+  const pts=R.top.slice(0,2).map(t=>strip(t.html));
+  const ptsEn=R.top.slice(0,2).map(t=>strip(t.en));
+  const team=j.team&&j.team!=='—'?`${j.team} 팀의 `:'';
+  const pay=j.comp?`처우 범위는 ${won(j.comp[0])}–${won(j.comp[1])}만원이고, `:'처우는 공고에 미공개인데 확인해서 알려드리겠습니다. ';
+  const link=j.url?`\n공고 원문: ${j.url}`:'';
+  const linkEn=j.url?`\nPosting: ${j.url}`:'';
+  if(lang==='en'){
+    const teamE=j.team&&j.team!=='—'?` on the ${j.team} team`:'';
+    return `Subject: ${j.co} — ${j.title}
+
+Hello,
+
+I'm writing about the ${j.title} opening at ${j.co}${teamE}. I read your background before writing, so here is the specific reason I think it fits:
+
+${ptsEn.map(p=>'· '+p).join('\n')}
+
+Working language: ${EN_L[j.en]}. ${j.comp?`Range: ${won(j.comp[0])}–${won(j.comp[1])} (10k KRW).`:'Compensation is not listed in the posting; I can find out.'} Location: ${j.loc}.${linkEn}
+${caveat?`\nOne thing to flag up front — ${caveat.t}. I'd rather raise it now than after an interview.\n`:''}
+If this role isn't right, telling me what you'd actually want next would help me stop sending you the wrong things.
+
+Best regards,`;
+  }
+  return `제목: ${j.co} ${j.title} — ${c.deg.topic!=='—'?c.deg.topic+' 관련':'경력 관련'} 제안
+
+안녕하세요, ${c.alias.replace(/\s*\(가명\)/,'')}님.
+
+${j.co} ${team}${j.title} 포지션 때문에 연락드립니다. 이력을 먼저 보고 쓰는 메일이라, 왜 이 자리를 골랐는지부터 적겠습니다.
+
+${pts.map(p=>'· '+p).join('\n')}
+
+업무 영어는 ${EN[j.en]} 수준입니다. ${pay}근무지는 ${j.loc}입니다.${link}
+${caveat?`\n미리 말씀드릴 부분 — ${caveat.t}: ${caveat.d}. 면접 뒤에 알려드리는 게 서로 손해라서 먼저 적었습니다.\n`:''}
+지금 이직 계획이 없으시면, 어떤 조건이면 움직일지만 알려주셔도 앞으로 안 맞는 공고는 안 보내겠습니다.
+
+감사합니다.`;
+}
+
+/* ---------------- 상태 ---------------- */
+const S={mode:'c2j',sel:'c1',pair:null,tab:'match',lang:'ko',blocked:false,lowInfo:false,q:'',src:'',aiOnly:true,cap:40,
+  W:Object.fromEntries(DIMS.map(d=>[d.k,d.w]))};
+const $=s=>document.querySelector(s), el=(t,a={})=>Object.assign(document.createElement(t),a);
+
+function jobPool(){
+  const q=S.q.trim().toLowerCase();
+  return J.filter(j=>{
+    if(S.aiOnly&&j.aiRole===false) return false;
+    if(S.src&&j.src!==S.src) return false;
+    if(q&&!`${j.co} ${j.title} ${(j.domains||[]).join(' ')} ${(j.must||[]).join(' ')}`.toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+function results(){
+  const pool=jobPool();
+  const list=S.mode==='c2j'
+    ? pool.map(j=>evaluate(C.find(x=>x.id===S.sel),j,S.W))
+    : C.map(c=>evaluate(c,J.find(x=>x.id===S.sel)||pool[0],S.W));
+  return list.sort((a,b)=>(a.gates.length-b.gates.length)||(a.lowInfo-b.lowInfo)||(b.total-a.total));
+}
+
+function railHTML(){
+  const items=S.mode==='c2j'?C:jobPool().slice(0,80);
+  return items.map(o=>{
+    const on=o.id===S.sel;
+    if(S.mode==='c2j'){
+      return `<button class="card" aria-current="${on}" data-id="${o.id}">
+        <div class="who">${o.alias} · ${o.deg.lv}</div>
+        <div class="sub">${o.now} · ${o.yrs===0?'신입':o.yrs+'년'}</div>
+        <div class="chips">
+          <span class="chip hi">${o.deg.topic==='—'?o.deg.major:o.deg.topic}</span>
+          <span class="chip">영어 ${o.en}·${EN[o.en]}</span>
+          <span class="chip">희망 ${won(o.comp.want)}</span>
+        </div>
+        <div class="meter" title="이직 의향 ${o.move}"><i style="width:${o.move}%"></i></div>
+      </button>`;
+    }
+    return `<button class="card" aria-current="${on}" data-id="${o.id}">
+      <div class="who">${o.co} · ${o.title}</div>
+      <div class="sub">${o.team!=='—'?o.team+' · ':''}${o.yrs[0]}–${o.yrs[1]}년 · ${o.loc}</div>
+      <div class="chips">
+        <span class="chip hi">${o.type}</span>
+        <span class="chip">영어 ${o.en}</span>
+        <span class="chip">${o.deg} 이상</span>
+        ${o.comp?`<span class="chip">${won(o.comp[0])}–${won(o.comp[1])}</span>`:'<span class="chip">처우 미공개</span>'}
+      </div>
+    </button>`;
+  }).join('');
+}
+
+function rowHTML(r){
+  const open=!!S.pair&&S.pair.split('|').includes(S.mode==='c2j'?r.j.id:r.c.id), blk=r.gates.length>0;
+  const title=S.mode==='c2j'?`${r.j.co} · ${r.j.title}`:`${r.c.alias} · ${r.c.deg.lv}`;
+  const sub=S.mode==='c2j'
+    ?`${r.j.team!=='—'?r.j.team+' · ':''}${r.j.type} · ${r.j.yrs[0]}–${r.j.yrs[1]}년 · 영어 ${r.j.en} · ${r.j.deg} 이상 · ${r.j.loc}`
+    :`${r.c.now} · ${yl(r.c.yrs)} · ${r.c.deg.topic} · 영어 ${r.c.en}`;
+  const stack=DIMS.map(d=>r.s[d.k]===null?'':`<i style="width:${r.contrib[d.k]/(r.WT||1)*100}%;background:var(${d.c})" title="${d.n} ${Math.round(r.s[d.k]*100)}%"></i>`).join('');
+  const flags=blk?r.gates.map(g=>`<span class="flag b" title="${g.d}">${g.t}</span>`).join('')
+    :(r.warns.length?r.warns.slice(0,2).map(w=>`<span class="flag w" title="${w.d}">${w.t}</span>`).join('')
+      :`<span class="flag g">이슈 없음</span>`);
+  const R=reasons(r), ev=r.j.evidence;
+  const detail=open?`<div class="detail">
+    ${DIMS.map(d=>r.s[d.k]===null
+      ?`<div class="dimrow nodata"><div class="dn">${d.n}<span class="lbl" style="margin-left:5px">w${S.W[d.k]}</span></div>
+         <div class="track"></div><div class="dv">—</div></div>`
+      :`<div class="dimrow"><div class="dn">${d.n}<span class="lbl" style="margin-left:5px">w${S.W[d.k]}</span></div>
+         <div class="track"><i style="width:${r.s[d.k]*100}%;background:var(${d.c})"></i></div>
+         <div class="dv">${Math.round(r.s[d.k]*100)}</div></div>`).join('')}
+    ${r.missing.length?`<div class="lbl" style="margin-top:6px;color:var(--warn)">데이터 없음 → 가중치 제외: ${r.missing.join(' · ')}</div>
+      <div class="lbl" style="margin-top:3px">원점수 ${r.raw} × 커버리지 ${Math.round(r.cov*100)}% 보정 → <b style="color:var(--ink)">${r.total}</b></div>`:''}
+    <div class="why"><b>보낼 이유</b><ul>${R.top.map(t=>`<li>${t.html}</li>`).join('')}</ul>
+      ${R.weak.length?`<div style="margin-top:8px"><span class="neg">먼저 짚어야 할 것</span><ul>${R.weak.map(t=>`<li>${t.html}</li>`).join('')}</ul></div>`:''}
+      ${blk?`<div style="margin-top:8px"><span class="neg">제외 사유</span><ul>${r.gates.map(g=>`<li>${g.t} — ${g.d}</li>`).join('')}</ul></div>`:''}
+      ${ev?`<div class="ev"><span class="lbl">공고에서 뽑아낸 근거</span>
+        <div><b>영어 ${r.j.en}</b> ← ${ev.en.from}${ev.en.quote?` · <q>${ev.en.quote}</q>`:''}</div>
+        <div><b>학위 ${r.j.deg}</b> ← ${ev.deg.from}${ev.deg.quote?` · <q>${ev.deg.quote}</q>`:''}</div>
+        <div><b>경력 ${r.j.yrs[0]}–${r.j.yrs[1]}년</b> ← ${ev.yrs.from}${ev.yrs.quote?` · <q>${ev.yrs.quote}</q>`:''}</div></div>`:''}
+      <div style="margin-top:8px;color:var(--ink-3);font-size:12px">출처 ${r.j.src}${r.j.posted?` · 게시 ${r.j.posted}`:''}${r.j.closes?` · 마감 ${String(r.j.closes).slice(0,10)}`:''}${r.j.rate&&r.j.rate.jp?` · 잡플래닛 ${r.j.rate.jp}`:' · 기업 평점 미연동'}</div>
+    </div>
+    <div class="act"><button class="btn primary" data-out="${r.c.id}|${r.j.id}">아웃리치 초안 만들기</button>
+      ${r.j.url?`<a class="btn" href="${r.j.url}" target="_blank" rel="noopener">공고 원문</a>`:''}
+      <span class="lbl" style="align-self:center">이직 의향 ${r.c.move} · ${r.c.moveWhy}</span></div>
+  </div>`:'';
+  return `<div class="row ${blk?'blk':''}" data-open="${open}">
+    <button class="rtop" data-pair="${S.mode==='c2j'?r.j.id:r.c.id}">
+      <div class="score">${r.total}<small>SCORE</small></div>
+      <div><div class="rtitle">${title}</div><div class="rsub">${sub}</div><div class="stack">${stack}</div></div>
+      <div class="flags">${flags}</div>
+    </button>${detail}</div>`;
+}
+
+/* ---------------- 데이터 소스 표 ---------------- */
+const SRC=[
+ ['잡코리아 <span class="pill ok">130건 수집</span>','공고 원문 + schema.org JobPosting (경력·학력·근무지·마감일)',
+  'robots.txt가 AI 크롤러(ClaudeBot 등)에 <b>경로를 명시 허용</b>: <code>Allow: /recruit/joblist</code>, <code>Allow: /Recruit/GI_Read</code>, <code>Allow: /recruit/ai-jobs</code>. 검색(<code>/Search</code>)·회원·기업관리 경로는 Disallow라 건드리지 않음. 도메인당 1.2초 간격.','ok','수집함'],
+ ['Greenhouse 공개 Job Board API <span class="pill ok">440건 수집</span>','기업이 직접 배포하는 최신 공고 전문 (영문 요건 그대로)',
+  '<code>boards-api.greenhouse.io/v1/boards/{token}/jobs</code> — 인증 없이 공개된 공식 엔드포인트. 쿠팡 646건 중 한국 근무지 350건, 크래프톤 71, 몰로코 12, 샌드버드 7. 기업이 스스로 공개하는 채널이라 스크래핑이 아님.','ok','수집함'],
+ ['공개 논문 색인 (arXiv · OpenAlex)','후보자의 석·박사 <b>연구 주제</b>, 1저자 여부, 국제학회 이력',
+  '공개 REST API. 연구 주제 매칭의 유일한 무료 데이터원 — 전공명보다 논문 주제가 훨씬 강한 신호.','ok','붙일 수 있음'],
+ ['GitHub REST API','실제 사용 스택, 활동량, 오픈소스 기여','공개 API. 토큰 발급 시 rate limit 상향.','ok','붙일 수 있음'],
+ ['후보자 직접 제출 (동의 폼)','희망 연봉, 이직 의향, 딜브레이커, 기업 성향 선호','자체 폼 + 개인정보 수집·이용 동의. 하드 게이트 대부분이 여기서 나온다.','ok','붙일 수 있음'],
+ ['원티드 <span class="pill no">수집 안 함</span>','공고 + 합격보상',
+  'robots.txt 자체가 <b>CloudFront 403</b>으로 막혀 있어 "허가받았다"고 말할 근거가 없음. 엣지 차단 우회는 회피 행위라 하지 않음. → 공식 파트너 API 어댑터만 준비(<code>WANTED_API_KEY</code>).','ap','파트너 API 필요'],
+ ['잡플래닛 <span class="pill no">수집 안 함</span>','기업 리뷰·연봉 통계 (기업 성향 정합 항목에 사용)',
+  'robots.txt에 AI 전용 차단은 없고 <code>Disallow: /search /apply /profile</code> 수준이라 공고 경로는 열려 있으나, 실제 요청이 <b>HTTP 403</b>으로 반송됨. → B2B 데이터 제휴가 정식 경로.','ap','403 반송 · 제휴 필요'],
+ ['사람인 채용정보 Open API','공고 + 기업 기본정보','공식 Open API. <code>SARAMIN_API_KEY</code> 발급하면 어댑터가 바로 동작.','ap','키 발급 필요'],
+ ['고용24(워크넷) 공공 API','전국 채용공고 원본','data.go.kr 인증키. 제약이 가장 적고 공공데이터라 상업적 활용도 열려 있음. <code>WORKNET_API_KEY</code>.','ap','키 발급 필요'],
+ ['LinkedIn <span class="pill no">실행 거부</span>','후보자 경력·학력',
+  'robots.txt 첫 줄에 <b>"자동 수단을 통한 LinkedIn 접근은 명시적 허가 없이 엄격히 금지"</b>. 그리고 <code>User-agent: ClaudeBot → Disallow: /</code>. 우회(UA 위장·프록시·로그인 세션 재사용)는 접근 통제 회피라 코드로 만들지 않았음. → Talent Solutions 유료 계약, 또는 후보자 본인 제출.','no','사이트가 금지'],
+ ['Blind <span class="pill no">실행 거부</span>','재직자 여론·연봉',
+  '<code>User-agent: ClaudeBot → Disallow: /</code>. 애초에 채용공고 보드가 아니라 커뮤니티이고 핵심 콘텐츠는 로그인 뒤. 기업 평판은 헤드헌터가 직접 읽고 후보에게 구두로 전하는 게 맞다.','no','사이트가 금지'],
+ ['수동 등록 (paste)','LinkedIn·Blind·원티드 공고를 Fitline에 넣는 합법 경로',
+  '사람이 브라우저로 정상 열람한 공고를 복사해 <code>fitline-data/pasted/*.txt</code>에 넣으면 같은 정규화기를 태운다. 자동 수집이 아니라 수동 이관이라 약관 문제가 없고, 주 20~50건이면 실무에서 충분히 감당된다.','ok','대체 경로'],
+];
+
+function renderSrc(){
+  $('#srcBody').innerHTML=SRC.map(([a,b,c,st,lb])=>`<tr>
+    <td><b>${a}</b></td><td>${b}</td><td><span class="n" style="margin:0">${c}</span></td>
+    <td><span class="pill ${st}">${lb}</span></td></tr>`).join('');
+  const n=J.length, ai=J.filter(x=>x.aiRole).length;
+  $('#srcSummary').innerHTML=LIVE
+    ?`이 화면의 공고 <b>${n}건</b>(AI·데이터 직무 <b>${ai}건</b>)은 위 표에서 <span class="pill ok">수집함</span>으로 표시된 두 경로에서만 가져온 <b>실제 데이터</b>입니다. robots.txt 차단으로 걸러진 요청은 0건, 실패 0건.`
+    :`현재 시드 데모 데이터로 동작 중입니다.`;
+}
+
+function renderSliders(){
+  $('#sliders').innerHTML=DIMS.map(d=>`<div class="slider">
+    <div class="sn">${d.n}</div>
+    <input type="range" min="0" max="30" value="${S.W[d.k]}" data-w="${d.k}" aria-label="${d.n} 가중치">
+    <div class="num" style="text-align:right;font-size:12px">${S.W[d.k]}</div></div>`).join('');
+  $('#wsum').textContent='합계 '+DIMS.reduce((a,d)=>a+S.W[d.k],0);
+  $('#sliders').querySelectorAll('input').forEach(i=>i.oninput=e=>{
+    S.W[e.target.dataset.w]=+e.target.value;
+    e.target.nextElementSibling.textContent=e.target.value;
+    $('#wsum').textContent='합계 '+DIMS.reduce((a,d)=>a+S.W[d.k],0);
+    renderMatch();
+  });
+}
+
+/* ---------------- 렌더 ---------------- */
+function renderOutreach(){
+  const box=$('#outreach');
+  if(!S.pair){box.innerHTML=`<div class="empty">매칭을 펼쳐서 <b>아웃리치 초안 만들기</b>를 누르면<br>상위 기여 항목이 그대로 첫 문단이 됩니다.</div>`;return}
+  const [cid,jid]=S.pair.split('|');
+  const c=C.find(x=>x.id===cid), j=J.find(x=>x.id===jid);
+  if(!c||!j){box.innerHTML=`<div class="empty">대상을 다시 선택해 주세요.</div>`;return}
+  const r=evaluate(c,j,S.W), body=draft(r,S.lang);
+  box.innerHTML=`<div class="draft">
+    <div class="to">받는 사람 <b>${c.alias}</b> · 공고 <b>${j.co} ${j.title}</b> · 점수 <b class="num">${r.total}</b></div>
+    <div class="msg">${body.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>
+    <div class="act"><button class="btn primary" id="copy">복사</button>
+      <button class="btn" id="clear">닫기</button></div></div>`;
+  $('#copy').onclick=async e=>{
+    try{await navigator.clipboard.writeText(body);e.target.textContent='복사됨'}
+    catch{const t=$('#clip');t.value=body;t.removeAttribute('aria-hidden');t.style.cssText='position:static;width:100%;height:180px;clip:auto';t.select();e.target.textContent='아래에서 직접 복사'}
+    setTimeout(()=>{if(e.target)e.target.textContent='복사'},1800);
+  };
+  $('#clear').onclick=()=>{S.pair=null;renderMatch()};
+}
+
+function renderMatch(){
+  const items=S.mode==='c2j'?C:J;
+  if(!items.some(o=>o.id===S.sel)) S.sel=items[0].id;
+  $('#railTitle').textContent=S.mode==='c2j'?`후보자 풀 · ${C.length}명`:`공고 풀 · ${J.length}건`;
+  $('#rail').innerHTML=railHTML();
+  $('#rail').querySelectorAll('.card').forEach(b=>b.onclick=()=>{S.sel=b.dataset.id;S.pair=null;renderMatch()});
+
+  const all=results(), open=all.filter(r=>!r.gates.length), blk=all.length-open.length;
+  const info=open.filter(r=>!r.lowInfo), thin=open.length-info.length;
+  const show=S.blocked?all:(S.lowInfo?open:info);
+  const subj=S.mode==='c2j'?C.find(x=>x.id===S.sel):(J.find(x=>x.id===S.sel)||jobPool()[0]||J[0]);
+  $('#resTitle').textContent=S.mode==='c2j'
+    ?`${subj.alias} → 보낼 만한 공고 ${S.lowInfo?open.length:info.length}건`
+    :`${subj.co} ${subj.title} → 접촉 가능 후보 ${open.length}명`;
+  const shown=show.slice(0,S.cap);
+  $('#results').innerHTML=(shown.length?shown.map(rowHTML).join('')
+    :`<div class="empty">요건을 통과하는 대상이 없습니다. 상단 <b>요건 미달 포함</b>을 켜서 무엇에 걸렸는지 확인하세요.</div>`)
+    +(show.length>S.cap?`<div class="morenote">상위 ${S.cap}건만 표시 — 조건 통과 ${show.length}건 중 <b>${show.length-S.cap}건은 화면에 없습니다</b>. 검색으로 좁히거나 <button class="btn" id="more" style="padding:3px 9px">더 보기</button></div>`:'');
+  const mb=$('#more'); if(mb) mb.onclick=()=>{S.cap+=40;renderMatch()};
+  $('#results').querySelectorAll('.rtop').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.pair, cur=S.pair&&S.pair.split('|').includes(id);
+    S.pair=cur?null:(S.mode==='c2j'?`${S.sel}|${id}`:`${id}|${S.sel}`);
+    renderMatch();
+  });
+  $('#results').querySelectorAll('[data-out]').forEach(b=>b.onclick=e=>{
+    e.stopPropagation();S.pair=b.dataset.out;renderOutreach();
+    document.getElementById('outPanel').scrollIntoView({block:'nearest',behavior:'smooth'});
+  });
+
+  const best=open[0];
+  $('#strip').innerHTML=`
+    <div class="stat"><span class="lbl">후보자</span><b>${C.length}</b></div>
+    <div class="stat"><span class="lbl">공고 풀</span><b>${jobPool().length}</b>
+      <span style="font-size:12px;color:var(--ink-2)">/ 전체 ${J.length}</span>
+      ${LIVE?'<span class="livebadge">실데이터</span>':'<span class="livebadge" style="background:var(--warn-soft);color:var(--warn);border-color:transparent">시드</span>'}</div>
+    <div class="stat"><span class="lbl">보낼 만한 건</span><b>${open.length}</b></div>
+    <div class="stat blocked"><span class="lbl">요건 미달</span><b>${blk}</b></div>
+    <div class="stat"><span class="lbl">관련성·정보 부족</span><b style="color:var(--warn)">${thin}</b>
+      <span style="font-size:12px;color:var(--ink-2)">${S.lowInfo?'표시 중':'숨김'}</span></div>
+    <div class="stat"><span class="lbl">최고 점수</span><b>${best?best.total:'—'}</b>
+      <span style="font-size:12px;color:var(--ink-2)">${best?(S.mode==='c2j'?best.j.co+' '+best.j.title:best.c.alias):''}</span></div>`;
+  renderOutreach();
+}
+
+function renderTab(){
+  ['match','src','logic'].forEach(t=>{
+    document.getElementById('view-'+t).hidden=(t!==S.tab);
+    document.querySelector(`[data-tab="${t}"]`).setAttribute('aria-selected',t===S.tab);
+  });
+}
+
+/* ---------------- 이벤트 ---------------- */
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{S.tab=b.dataset.tab;renderTab()});
+$('#dirC').onclick=()=>{S.mode='c2j';S.sel=C[0].id;S.pair=null;$('#dirC').setAttribute('aria-pressed','true');$('#dirJ').setAttribute('aria-pressed','false');renderMatch()};
+$('#dirJ').onclick=()=>{S.mode='j2c';S.sel=J[0].id;S.pair=null;$('#dirJ').setAttribute('aria-pressed','true');$('#dirC').setAttribute('aria-pressed','false');renderMatch()};
+$('#langKo').onclick=()=>{S.lang='ko';$('#langKo').setAttribute('aria-pressed','true');$('#langEn').setAttribute('aria-pressed','false');renderOutreach()};
+$('#langEn').onclick=()=>{S.lang='en';$('#langEn').setAttribute('aria-pressed','true');$('#langKo').setAttribute('aria-pressed','false');renderOutreach()};
+$('#showBlocked').onchange=e=>{S.blocked=e.target.checked;renderMatch()};
+
+// 출처 셀렉트 채우기
+(()=>{
+  const counts={}; J.forEach(j=>counts[j.src]=(counts[j.src]||0)+1);
+  $('#srcSel').innerHTML=`<option value="">전체 출처 (${J.length})</option>`+
+    Object.entries(counts).sort((a,b)=>b[1]-a[1])
+      .map(([k,v])=>`<option value="${k}">${k} (${v})</option>`).join('');
+})();
+let qt;
+$('#q').oninput=e=>{clearTimeout(qt);qt=setTimeout(()=>{S.q=e.target.value;S.cap=40;S.pair=null;renderMatch()},220)};
+$('#srcSel').onchange=e=>{S.src=e.target.value;S.cap=40;S.pair=null;renderMatch()};
+$('#aiOnly').onchange=e=>{S.aiOnly=e.target.checked;S.cap=40;S.pair=null;renderMatch()};
+$('#lowInfoChk').onchange=e=>{S.lowInfo=e.target.checked;S.cap=40;S.pair=null;renderMatch()};
+
+renderSrc();renderSliders();renderTab();renderMatch();
+</script>

@@ -1,0 +1,12 @@
+# 수집한 공고 데이터 — 제3자 콘텐츠라 저장소에 넣지 않는다.
+# 클론한 사람이 직접 수집한다: node fitline-ingest/run.mjs
+fitline-data/jobs.json
+fitline-data/ingest-report.json
+fitline-data/pasted/
+
+# 데이터가 주입된 빌드 산출물
+dist/
+
+node_modules/
+.DS_Store
+.vercel
