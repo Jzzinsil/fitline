@@ -2,6 +2,7 @@
 // 기업이 스스로 공개 API로 배포하는 채널이라 재배포가 그 취지에 부합한다.
 // 잡코리아 등 robots.txt로 '접근'만 허용된 소스는 제외한다 — 접근 허가 ≠ 재배포 권리.
 import fs from 'node:fs';
+import { withAnalytics } from './analytics.mjs';
 
 // 저장소에 커밋된 Greenhouse 스냅샷을 먼저 쓴다 (Vercel 빌드에서 재현 가능하게).
 // 로컬에서 방금 수집했으면 jobs.json에서 Greenhouse 분만 추출한다.
@@ -24,8 +25,9 @@ if (!RX.test(html)) { console.error('✖ 주입 슬롯을 못 찾았습니다.')
 const out = html.replace(RX, (_, a, b) => a + JSON.stringify(slim).replace(/</g, '\\u003c') + b);
 
 fs.mkdirSync('dist', { recursive: true });
-fs.writeFileSync('dist/index.html', out);
-fs.writeFileSync('dist/fitline.html', out);
+const page = withAnalytics(out);
+fs.writeFileSync('dist/index.html', page);
+fs.writeFileSync('dist/fitline.html', page);
 
 const by = {};
 slim.forEach(j => { by[j.co] = (by[j.co] || 0) + 1 });
