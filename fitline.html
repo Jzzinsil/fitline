@@ -3,6 +3,10 @@
 <title>Fitline</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
 <style>
 :root{
   --ground:#EEF2F1; --surface:#FCFDFD; --surface-2:#F4F7F6;
@@ -752,7 +756,7 @@ function rowHTML(r){
 /* ---------------- 데이터 소스 표 ---------------- */
 const SRC=[
  ['잡코리아 <span class="pill ok">130건 수집</span>','공고 원문 + schema.org JobPosting (경력·학력·근무지·마감일)',
-  'robots.txt가 AI 크롤러(ClaudeBot 등)에 <b>경로를 명시 허용</b>: <code>Allow: /recruit/joblist</code>, <code>Allow: /Recruit/GI_Read</code>, <code>Allow: /recruit/ai-jobs</code>. 검색(<code>/Search</code>)·회원·기업관리 경로는 Disallow라 건드리지 않음. 도메인당 1.2초 간격.','ok','수집함'],
+  'robots.txt가 AI 크롤러(ClaudeBot 등)에 <b>경로를 명시 허용</b>: <code>Allow: /recruit/joblist</code>, <code>Allow: /Recruit/GI_Read</code>, <code>Allow: /recruit/ai-jobs</code>. 검색(<code>/Search</code>)·회원·기업관리 ��로는 Disallow라 건드리지 않음. 도메인당 1.2초 간격.','ok','수집함'],
  ['Greenhouse 공개 Job Board API <span class="pill ok">440건 수집</span>','기업이 직접 배포하는 최신 공고 전문 (영문 요건 그대로)',
   '<code>boards-api.greenhouse.io/v1/boards/{token}/jobs</code> — 인증 없이 공개된 공식 엔드포인트. 쿠팡 646건 중 한국 근무지 350건, 크래프톤 71, 몰로코 12, 샌드버드 7. 기업이 스스로 공개하는 채널이라 스크래핑이 아님.','ok','수집함'],
  ['공개 논문 색인 (arXiv · OpenAlex)','후보자의 석·박사 <b>연구 주제</b>, 1저자 여부, 국제학회 이력',
